@@ -25,9 +25,10 @@ public class HibernateRunner {
 
     public static void main(String[] args) throws IOException {
 
-
-        FileRepository fileRepository = FileRepository.getInstance();
-        System.out.println(fileRepository.getFileIdByName("timur_test"));
+        UserRepository userRepository = UserRepository.getInstance();
+        Optional<User> maybeUser = userRepository.getById(13);
+        List<Integer> eventId = maybeUser.get().getEvents().stream().map(Event::getId).toList();
+        System.out.println(eventId);
     }
 
     private static void getAllFileTest() {

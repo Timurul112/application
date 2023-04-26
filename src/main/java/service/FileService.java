@@ -88,10 +88,7 @@ public class FileService {
         if (!fileIds.contains(fileId)) {
             throw new RuntimeException("Нет доступа к файлу");
         }
-        boolean isDeleted = Files.deleteIfExists(Path.of(URI.create(INCOMPLETE_PATH + fileName)));
-        if (!isDeleted) {
-            throw new RuntimeException("Файл не существует");
-        }
+        Files.deleteIfExists(Path.of(URI.create(INCOMPLETE_PATH + fileName)));
         File file = File.builder()
                 .id(fileId)
                 .name(fileName)

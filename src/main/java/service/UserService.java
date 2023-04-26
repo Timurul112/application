@@ -27,6 +27,7 @@ public class UserService {
     public void deleteById(Integer id) {
         Optional<User> maybeUser = userRepository.getById(id);
         List<String> listFileNames = maybeUser.get().getEvents().stream().map(event -> event.getFile().getName()).toList();
+
         listFileNames.forEach(fileName -> {
             try {
                 fileService.deleteByName(fileName, id);

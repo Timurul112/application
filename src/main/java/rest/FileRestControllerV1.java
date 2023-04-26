@@ -44,7 +44,7 @@ public class FileRestControllerV1 extends HttpServlet {
         String fileName = request.getParameter("file_name");
         CheckExist.checkNotNullUserIdAndFileName(maybeUserId, fileName);
         Integer userId = Integer.valueOf(maybeUserId);
-        UserDto userDto = userService.getById(userId).orElseThrow(() -> new RuntimeException("Пользователя не существует"));
+        userService.getById(userId).orElseThrow(() -> new RuntimeException("Пользователя не существует"));
         if (!Files.exists(Path.of(URI.create(INCOMPLETE_PATH + fileName)))) {
             throw new RuntimeException("Файла не существует");
         }
@@ -91,6 +91,4 @@ public class FileRestControllerV1 extends HttpServlet {
             setJsonResponse(fileDto, response);
         }
     }
-
-
 }
