@@ -34,15 +34,21 @@ public class FileService {
     private FileService() {
     }
 
-    public void deleteById(Integer fileId, Integer userId) {
-        fileRepository.delete(fileId);
-        EventDto eventDto = EventDto.builder()
-                .fileId(fileId)
-                .userId(userId)
-                .build();
-        eventService.save(eventDto);
-    }
-
+//    public void deleteById(Integer fileId, Integer userId) {
+//        File file = fileRepository.getById(fileId).get();
+//        File updatedFile = File.builder()
+//                .status("DELETED")
+//                .id(file.getId())
+//                .name(file.getName())
+//                .filePath(file.getFilePath())
+//                .build();
+//        fileRepository.update(updatedFile);
+//        EventDto eventDto = EventDto.builder()
+//                .fileId(fileId)
+//                .userId(userId)
+//                .build();
+//        eventService.save(eventDto);
+//    }
 
 
     public Optional<FileDto> getById(Integer id) {
@@ -64,6 +70,7 @@ public class FileService {
             File file = File.builder()
                     .name(fileName)
                     .filePath(INCOMPLETE_DIRECTORY_PATH + fileName)
+                    .status("SAVED")
                     .build();
             File savedFile = fileRepository.save(file);
             EventDto eventDto = EventDto.builder()
@@ -85,6 +92,24 @@ public class FileService {
                 .build();
         eventService.save(eventDto);
         return result;
+    }
+
+
+    public void deleteByName(String fileName, Integer userId) throws IOException {
+        Files.delete(Path.of(URI.create(INCOMPLETE_PATH + fileName)));
+        Integer fileId = fileRepository.getAll().stream().filter(file -> file.getName().equals(fileName)).findFirst().get().getId();
+        File file = File.builder()
+                .id(fileId)
+                .name(fileName)
+                .filePath(INCOMPLETE_DIRECTORY_PATH + fileName)
+                .status("DELETED")
+                .build();
+        fileRepository.update(file);
+        EventDto eventDto = EventDto.builder()
+                .userId(userId)
+                .fileId(fileId)
+                .build();
+        eventService.save(eventDto);
     }
 
     public static FileService getInstance() {

@@ -21,7 +21,6 @@ public class FileRestControllerV1 extends HttpServlet {
 
     private final UserService userService = UserService.getInstance();
     private final FileService fileService = FileService.getInstance();
-    //    private static final String INCOMPLETE_PATH = "my_computer";
     private static final String INCOMPLETE_PATH = "file:///C:/Users/timga/IdeaProjects/timur_project/my_computer/";
 
 
@@ -42,23 +41,24 @@ public class FileRestControllerV1 extends HttpServlet {
         fileService.uploadFile(request, fileName, userId);
     }
 
-
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
-        String maybeFileId = request.getParameter("file_id");
-        String maybeId = request.getParameter("user_id");
-        if (maybeId == null) {
-            throw new RuntimeException("Вы не ввели id пользователя");
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String maybeUserId = request.getParameter("user_id");
+        String fileName = request.getParameter("file_name");
+        if (maybeUserId == null) {
+            throw new RuntimeException("Введите имя пользователя");
         }
-        if (maybeFileId == null) {
-            throw new RuntimeException("Вы не ввели id файла");
+        Integer userId = Integer.valueOf(maybeUserId);
+        if (fileName == null) {
+            throw new RuntimeException("Введите имя файла");
         }
-        Integer userId = Integer.valueOf(maybeId);
-        Integer fileId = Integer.valueOf(maybeFileId);
         userService.getById(userId).orElseThrow(() -> new RuntimeException("Пользователя не существует"));
-        FileDto fileDto = fileService.getById(fileId).orElseThrow(() -> new RuntimeException("Файла не существует"));
-        fileService.deleteById(fileId, userId);
+        if (!Files.exists(Path.of(URI.create(INCOMPLETE_PATH + fileName)))) {
+            throw new RuntimeException("Файла не существует");
+        }
+        fileService.deleteByName(fileName, userId);
     }
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -70,7 +70,7 @@ public class FileRestControllerV1 extends HttpServlet {
             setJsonResponse(files, response);
         } else if (maybeId != null && fileName != null && maybeFileId == null) {
             if (!Files.exists(Path.of(URI.create(INCOMPLETE_PATH + fileName)))) {
-                throw new RuntimeException("Такого файла не существует");
+                throw new RuntimeException("Файла не существует");
             }
             Integer id = Integer.valueOf(maybeId);
             userService.getById(id).orElseThrow((() -> new RuntimeException("Пользователя не существует")));
@@ -79,7 +79,7 @@ public class FileRestControllerV1 extends HttpServlet {
             setJsonResponse(downloadFile, response);
         } else {
             Integer fileId = Integer.valueOf(maybeFileId);
-            FileDto fileDto = fileService.getById(fileId).orElseThrow(() -> new RuntimeException("Такого файла нет на сервере"));
+            FileDto fileDto = fileService.getById(fileId).orElseThrow(() -> new RuntimeException("Файла не существует"));
             setJsonResponse(fileDto, response);
         }
     }

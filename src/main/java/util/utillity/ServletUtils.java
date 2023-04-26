@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 @UtilityClass
 public class ServletUtils {
 
+
     public static void setJsonResponse(String jsonResponse, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());

@@ -8,7 +8,8 @@ CREATE TABLE file
 (
     id        SERIAL PRIMARY KEY,
     name      VARCHAR(128) NOT NULL,
-    file_path VARCHAR(128) NOT NULL
+    file_path VARCHAR(128) NOT NULL,
+    status VARCHAR(128) NOT NULL
 );
 
 CREATE TABLE event

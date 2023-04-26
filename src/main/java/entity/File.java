@@ -23,6 +23,8 @@ public class File {
     @Column(name = "file_path")
     private String filePath;
 
+    private String status;
+
     @OneToMany(mappedBy = "file", cascade = CascadeType.ALL)
     private List<Event> events = new ArrayList<>();
 

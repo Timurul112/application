@@ -22,6 +22,6 @@ public class User {
     String name;
 
     @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     List<Event> events = new ArrayList<>();
 }
