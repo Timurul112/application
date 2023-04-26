@@ -27,9 +27,7 @@ public class HibernateRunner {
 
 
         FileRepository fileRepository = FileRepository.getInstance();
-
-        fileRepository.delete(21);
-
+        System.out.println(fileRepository.getFileIdByName("timur_test"));
     }
 
     private static void getAllFileTest() {

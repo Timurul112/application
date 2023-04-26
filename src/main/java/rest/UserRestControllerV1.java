@@ -22,6 +22,9 @@ public class UserRestControllerV1 extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String name = request.getParameter("name");
+        if (name == null) {
+            throw new RuntimeException("Введите имя пользователя");
+        }
         UserDto userDto = UserDto.builder()
                 .name(name)
                 .build();

@@ -38,23 +38,6 @@ public class FileService {
     private FileService() {
     }
 
-//    public void deleteById(Integer fileId, Integer userId) {
-//        File file = fileRepository.getById(fileId).get();
-//        File updatedFile = File.builder()
-//                .status("DELETED")
-//                .id(file.getId())
-//                .name(file.getName())
-//                .filePath(file.getFilePath())
-//                .build();
-//        fileRepository.update(updatedFile);
-//        EventDto eventDto = EventDto.builder()
-//                .fileId(fileId)
-//                .userId(userId)
-//                .build();
-//        eventService.save(eventDto);
-//    }
-
-
     public Optional<FileDto> getById(Integer id) {
         Optional<File> maybeFile = fileRepository.getById(id);
         return maybeFile.map(fileMapper::mapToDto);
@@ -85,14 +68,13 @@ public class FileService {
         }
     }
 
-    //    Path downloadPath = Path.of(URI.create("file:///C:/Users/timga/IdeaProjects/timur_project/my_computer/" + "sound"));
     public String downloadFile(String fileName, Integer userId) throws IOException {
         Path downloadPath = Path.of(URI.create(INCOMPLETE_PATH + fileName));
         String result = new String(Files.readAllBytes(downloadPath));
-        Optional<Integer> fileId = getAll().stream().filter(file -> file.getFileName().equals(fileName)).findFirst().map(FileDto::getId);
+        Integer fileId = fileRepository.getFileIdByName(fileName);
         EventDto eventDto = EventDto.builder()
                 .userId(userId)
-                .fileId(fileId.get())
+                .fileId(fileId)
                 .build();
         eventService.save(eventDto);
         return result;
@@ -100,13 +82,16 @@ public class FileService {
 
 
     public void deleteByName(String fileName, Integer userId) throws IOException {
-        Integer fileId = fileRepository.getAll().stream().filter(file -> file.getName().equals(fileName)).findFirst().get().getId();
+        Integer fileId = fileRepository.getFileIdByName(fileName);
         User user = userRepository.getById(userId).get();
         List<Integer> fileIds = user.getEvents().stream().map(event -> event.getFile().getId()).toList();
         if (!fileIds.contains(fileId)) {
             throw new RuntimeException("Нет доступа к файлу");
         }
-        Files.delete(Path.of(URI.create(INCOMPLETE_PATH + fileName)));
+        boolean isDeleted = Files.deleteIfExists(Path.of(URI.create(INCOMPLETE_PATH + fileName)));
+        if (!isDeleted) {
+            throw new RuntimeException("Файл не существует");
+        }
         File file = File.builder()
                 .id(fileId)
                 .name(fileName)
@@ -118,6 +103,29 @@ public class FileService {
                 .userId(userId)
                 .fileId(fileId)
                 .build();
+        eventService.save(eventDto);
+    }
+
+    public void update(HttpServletRequest request, Integer userId, String fileName) throws IOException {
+        Integer fileId = fileRepository.getFileIdByName(fileName);
+        List<Integer> fileIds = userRepository.getById(userId).get().getEvents().stream().map(event -> event.getFile().getId()).toList();
+        if (!fileIds.contains(fileId)) {
+            throw new RuntimeException("Нет доступа к файлу");
+        }
+        Path path = Path.of(URI.create(INCOMPLETE_PATH + fileName));
+        Files.delete(path);
+        Files.write(path, request.getInputStream().readAllBytes());
+        File updatedFile = File.builder()
+                .id(fileId)
+                .status("UPDATED")
+                .filePath(INCOMPLETE_DIRECTORY_PATH + fileName)
+                .name(fileName)
+                .build();
+        EventDto eventDto = EventDto.builder()
+                .fileId(fileId)
+                .userId(userId)
+                .build();
+        fileMapper.mapToDto(fileRepository.update(updatedFile));
         eventService.save(eventDto);
     }
 

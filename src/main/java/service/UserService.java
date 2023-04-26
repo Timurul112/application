@@ -6,15 +6,10 @@ import mapper.UserMapper;
 import repository.UserRepository;
 
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
 public class UserService {
-
-    private static final String INCOMPLETE_DIRECTORY_PATH = "my_computer/";
 
 
     private UserService() {

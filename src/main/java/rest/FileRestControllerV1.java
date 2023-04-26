@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.FileService;
 import service.UserService;
+import util.utillity.CheckExist;
 
 import java.io.IOException;
 import java.net.URI;
@@ -29,18 +30,27 @@ public class FileRestControllerV1 extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String maybeUserId = request.getParameter("user_id");
         String fileName = request.getParameter("file_name");
-        if (maybeUserId == null) {
-            throw new RuntimeException("Вы не ввели id пользователя");
-        }
-        if (fileName == null) {
-            throw new RuntimeException("Вы не ввели имя файла");
-        }
+        CheckExist.checkNotNullUserIdAndFileName(maybeUserId, fileName);
         Integer userId = Integer.valueOf(maybeUserId);
         if (userService.getById(userId).isEmpty()) {
             throw new RuntimeException("Пользователя не сущетсвует");
         }
         fileService.uploadFile(request, fileName, userId);
     }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String maybeUserId = request.getParameter("user_id");
+        String fileName = request.getParameter("file_name");
+        CheckExist.checkNotNullUserIdAndFileName(maybeUserId, fileName);
+        Integer userId = Integer.valueOf(maybeUserId);
+        UserDto userDto = userService.getById(userId).orElseThrow(() -> new RuntimeException("Пользователя не существует"));
+        if (!Files.exists(Path.of(URI.create(INCOMPLETE_PATH + fileName)))) {
+            throw new RuntimeException("Файла не существует");
+        }
+        fileService.update(request, userId, fileName);
+    }
+
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -51,12 +61,9 @@ public class FileRestControllerV1 extends HttpServlet {
         }
         Integer userId = Integer.valueOf(maybeUserId);
         if (fileName == null) {
-            throw new RuntimeException("Введите имя файла");
+            throw new RuntimeException("Вы");
         }
-        UserDto userDto = userService.getById(userId).orElseThrow(() -> new RuntimeException("Пользователя не существует"));
-        if (!Files.exists(Path.of(URI.create(INCOMPLETE_PATH + fileName)))) {
-            throw new RuntimeException("Файла не существует");
-        }
+        userService.getById(userId).orElseThrow(() -> new RuntimeException("Пользователя не существует"));
         fileService.deleteByName(fileName, userId);
     }
 
@@ -84,4 +91,6 @@ public class FileRestControllerV1 extends HttpServlet {
             setJsonResponse(fileDto, response);
         }
     }
+
+
 }
