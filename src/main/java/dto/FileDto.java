@@ -10,4 +10,5 @@ public class FileDto {
     String fileName;
     String filePath;
     Integer id;
+    String status;
 }

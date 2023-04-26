@@ -5,10 +5,16 @@ import entity.User;
 import mapper.UserMapper;
 import repository.UserRepository;
 
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
 public class UserService {
+
+    private static final String INCOMPLETE_DIRECTORY_PATH = "my_computer/";
 
 
     private UserService() {
@@ -19,9 +25,20 @@ public class UserService {
     private final UserRepository userRepository = UserRepository.getInstance();
     private final UserMapper userMapper = UserMapper.getInstance();
 
+    private final FileService fileService = FileService.getInstance();
+
+
 
     public void deleteById(Integer id) {
         Optional<User> maybeUser = userRepository.getById(id);
+        List<String> listFileNames = maybeUser.get().getEvents().stream().map(event -> event.getFile().getName()).toList();
+        listFileNames.forEach(fileName -> {
+            try {
+                fileService.deleteByName(fileName, id);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
         maybeUser.ifPresent(user -> userRepository.delete(user.getId()));
     }
 

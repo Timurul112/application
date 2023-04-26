@@ -1,6 +1,7 @@
 package rest;
 
 import dto.FileDto;
+import dto.UserDto;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,7 +53,7 @@ public class FileRestControllerV1 extends HttpServlet {
         if (fileName == null) {
             throw new RuntimeException("Введите имя файла");
         }
-        userService.getById(userId).orElseThrow(() -> new RuntimeException("Пользователя не существует"));
+        UserDto userDto = userService.getById(userId).orElseThrow(() -> new RuntimeException("Пользователя не существует"));
         if (!Files.exists(Path.of(URI.create(INCOMPLETE_PATH + fileName)))) {
             throw new RuntimeException("Файла не существует");
         }
@@ -65,7 +66,7 @@ public class FileRestControllerV1 extends HttpServlet {
         String maybeId = request.getParameter("user_id");
         String fileName = request.getParameter("file_name");
         String maybeFileId = request.getParameter("file_id");
-        if ((maybeId == null && fileName == null) && maybeFileId == null) {
+        if (maybeId == null && fileName == null && maybeFileId == null) {
             List<FileDto> files = fileService.getAll();
             setJsonResponse(files, response);
         } else if (maybeId != null && fileName != null && maybeFileId == null) {

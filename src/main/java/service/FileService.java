@@ -4,10 +4,12 @@ package service;
 import dto.EventDto;
 import dto.FileDto;
 import entity.File;
+import entity.User;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import mapper.FileMapper;
 import repository.FileRepository;
+import repository.UserRepository;
 
 import java.io.IOException;
 import java.net.URI;
@@ -30,6 +32,8 @@ public class FileService {
 
 
     private final EventService eventService = EventService.getInstance();
+
+    private final UserRepository userRepository = UserRepository.getInstance();
 
     private FileService() {
     }
@@ -96,8 +100,13 @@ public class FileService {
 
 
     public void deleteByName(String fileName, Integer userId) throws IOException {
-        Files.delete(Path.of(URI.create(INCOMPLETE_PATH + fileName)));
         Integer fileId = fileRepository.getAll().stream().filter(file -> file.getName().equals(fileName)).findFirst().get().getId();
+        User user = userRepository.getById(userId).get();
+        List<Integer> fileIds = user.getEvents().stream().map(event -> event.getFile().getId()).toList();
+        if (!fileIds.contains(fileId)) {
+            throw new RuntimeException("Нет доступа к файлу");
+        }
+        Files.delete(Path.of(URI.create(INCOMPLETE_PATH + fileName)));
         File file = File.builder()
                 .id(fileId)
                 .name(fileName)

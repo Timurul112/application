@@ -16,6 +16,7 @@ public class FileMapper implements Mapper<File, FileDto> {
                 .id(entity.getId())
                 .fileName(entity.getName())
                 .filePath(entity.getFilePath())
+                .status(entity.getStatus())
                 .build();
     }
 
