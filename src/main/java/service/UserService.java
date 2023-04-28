@@ -16,12 +16,10 @@ public class UserService {
     }
 
     private static final UserService INSTANCE = new UserService();
+    private UserRepository userRepository = UserRepository.getInstance();
+    private UserMapper userMapper = UserMapper.getInstance();
 
-    private final UserRepository userRepository = UserRepository.getInstance();
-    private final UserMapper userMapper = UserMapper.getInstance();
-
-    private final FileService fileService = FileService.getInstance();
-
+    private FileService fileService = FileService.getInstance();
 
 
     public void deleteById(Integer id) {

@@ -24,16 +24,16 @@ public class FileService {
     private static final String INCOMPLETE_DIRECTORY_PATH = "my_computer/";
 
 
-    private final FileRepository fileRepository = FileRepository.getInstance();
+    private FileRepository fileRepository = FileRepository.getInstance();
 
-    private static final FileService INSTANCE = new FileService();
+    public static final FileService INSTANCE = new FileService();
 
-    private final FileMapper fileMapper = FileMapper.getInstance();
+    private FileMapper fileMapper = FileMapper.getInstance();
 
 
-    private final EventService eventService = EventService.getInstance();
+    private EventService eventService = EventService.getInstance();
 
-    private final UserRepository userRepository = UserRepository.getInstance();
+    private UserRepository userRepository = UserRepository.getInstance();
 
     private FileService() {
     }

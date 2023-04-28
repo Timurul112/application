@@ -18,11 +18,10 @@ public class EventService {
     }
 
     public static EventService INSTANCE = new EventService();
-    private final FileRepository fileRepository = FileRepository.getInstance();
-    private final UserRepository userRepository = UserRepository.getInstance();
-    private final EventRepository eventRepository = EventRepository.getInstance();
+    private FileRepository fileRepository = FileRepository.getInstance();
+    private UserRepository userRepository = UserRepository.getInstance();
+    private EventRepository eventRepository = EventRepository.getInstance();
     EventMapper eventMapper = EventMapper.getInstance();
-
 
 
     public void save(EventDto event) {
