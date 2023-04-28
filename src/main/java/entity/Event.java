@@ -19,7 +19,7 @@ public class Event {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = {})
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "file_id")
     private File file;
 
