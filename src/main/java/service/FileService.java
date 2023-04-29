@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class FileService {
+    private FileService() {
+    }
+    private static FileService INSTANCE = new FileService();
 
     private static final String INCOMPLETE_PATH = "file:///C:/Users/timga/IdeaProjects/timur_project/my_computer/";
     private static final String INCOMPLETE_DIRECTORY_PATH = "my_computer/";
@@ -26,7 +29,6 @@ public class FileService {
 
     private FileRepository fileRepository = FileRepository.getInstance();
 
-    public static final FileService INSTANCE = new FileService();
 
     private FileMapper fileMapper = FileMapper.getInstance();
 
@@ -35,8 +37,6 @@ public class FileService {
 
     private UserRepository userRepository = UserRepository.getInstance();
 
-    private FileService() {
-    }
 
     public Optional<FileDto> getById(Integer id) {
         Optional<File> maybeFile = fileRepository.getById(id);

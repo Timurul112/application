@@ -1,22 +1,27 @@
 package service;
 
 import dto.UserDto;
+import entity.Event;
+import entity.File;
 import entity.User;
 import mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import repository.UserRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +32,9 @@ class UserServiceTest {
     @Mock
     private UserMapper userMapper;
 
+    @Mock
+    private FileService fileService;
+
     @InjectMocks
     private UserService userService;
 
@@ -34,9 +42,33 @@ class UserServiceTest {
     @Test
     void deleteById() throws IOException {
 
+        File file = File.builder()
+                .id(1)
+                .filePath("my_computer/test")
+                .name("test")
+                .status("SAVED")
+                .build();
 
+        Event event = Event.builder()
+                .id(1)
+                .file(file)
+                .build();
+
+        User user = User.builder()
+                .id(1)
+                .name("Timur")
+                .events(Arrays.asList(event))
+                .build();
+
+
+        doReturn(Optional.of(user)).when(userRepository).getById(user.getId());
+
+
+        userService.deleteById(1);
+
+        verify(fileService, Mockito.times(1)).deleteByName("test", 1);
+        verify(userRepository, Mockito.times(1)).delete(1);
     }
-
 
     @Test
     void getById() {
@@ -104,8 +136,8 @@ class UserServiceTest {
                 .name("Артем")
                 .build();
 
-        doReturn(userRepo).when(userRepository).update(userRepo);
         doReturn(userRepo).when(userMapper).mapToEntity(userDto);
+        doReturn(userRepo).when(userRepository).update(userRepo);
         doReturn(userDto).when(userMapper).mapToDto(userRepo);
 
         UserDto actualResult = userService.update(userDto);

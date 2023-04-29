@@ -17,7 +17,7 @@ public class EventService {
     private EventService() {
     }
 
-    public static EventService INSTANCE = new EventService();
+    private static EventService INSTANCE = new EventService();
     private FileRepository fileRepository = FileRepository.getInstance();
     private UserRepository userRepository = UserRepository.getInstance();
     private EventRepository eventRepository = EventRepository.getInstance();

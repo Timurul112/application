@@ -68,7 +68,7 @@ public class EventRepository implements CrudRepository<Integer, Event> {
 
 
     @Override
-    public Event save(Event entity) { //нужен точно
+    public Event save(Event entity) {
         try (SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
              Session session = sessionFactory.openSession()) {
             try {

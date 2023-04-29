@@ -17,7 +17,7 @@ public class UserService {
 
     private static final UserService INSTANCE = new UserService();
     private UserRepository userRepository = UserRepository.getInstance();
-    private UserMapper userMapper = UserMapper.getInstance();
+    private  UserMapper  userMapper = UserMapper.getInstance();
 
     private FileService fileService = FileService.getInstance();
 
